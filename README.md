@@ -1,4 +1,5 @@
-Excel_Snippets
+Excel Snippets
 ==============
 
 Some useful excel snippets
+
