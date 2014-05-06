@@ -1,0 +1,71 @@
+
+' this routine creates text files to log user activity and forces users to enable macros to interact with the file
+
+Private Sub Workbook_Open()
+
+' alerts user that they can't save changes
+
+    If ActiveWorkbook.ReadOnly Then
+        MsgBox "Someone Else is in the file. Please Wait"
+
+' sometimes network funnies make files read only even when there is no-one in there
+
+        MsgBox "Sometimes Excel Will erroneous say that someone is in there when they are not." _
+                & "if so open the file via the Excel open dialogue rather than double clicking" _
+                & " in the windows explorer."
+        
+        ActiveWorkbook.Close False
+    End If
+
+' logger is a routine to create a text file into a log directory to check whose using file.  
+    Call Logger
+    
+    ' The workbook that this is from uses a userform to do data entry
+    UserForm1.Show
+    
+End Sub
+
+
+' before close routine to hide reporting sheets from users
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    On Error Resume Next
+
+' xlVeryHidden makes the sheets inaccessible to users except when they enable macros.     
+' write a warning message on an initial worksheet to tell users to enable macros
+
+    Worksheets("Summary").Visible = xlVeryHidden
+    Worksheets("Weekly Hours").Visible = xlVeryHidden
+    
+    
+    On Error GoTo 0
+    
+End Sub
+
+' logging routine to check which users are interacting with a file. 
+
+Sub Logger()
+Dim Name As String
+Dim tmp As String
+Dim LoggingDirectory As String
+
+' enter your directory
+' eg "P:\Overtime requests\adv admin testing\"
+  
+    LoggingDirectory = ""
+
+    ' this object allows for interaction with windows commands
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    
+    ' this accesses the username of the user that is logged on the computer
+    Name = Environ$("UserName")
+    
+    ' this is the time when the macro executes
+    tnp = CDbl(Now())
+    
+    ' this creates a text file
+    Set a = fs.CreateTextFile( LoggingDirectory & Name & " " & tnp, True)
+
+End Sub
+
+
